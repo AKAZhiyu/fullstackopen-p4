@@ -114,13 +114,42 @@ describe('when there are some blogs saved initially', () => {
 
         test('returns 204 if blog does not exist', async () => {
             const nonExistId = await helper.nonExistingId()
-            
+
             await api
                 .delete(`/api/blogs/${nonExistId}`)
-                .expect(204)  
-        
+                .expect(204)
+
             const blogsAtEnd = await helper.blogsInDb()
             assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+        })
+    })
+
+    describe.only('updating of a blog', () => {
+        test('succeeds with status code 200 when likes are updated', async () => {
+            const blogsAtStart = await helper.blogsInDb()
+            const blogToUpdate = blogsAtStart[0]
+            const updatedBlog = {
+                ...blogToUpdate,
+                likes: blogToUpdate.likes + 1
+            }
+
+            const response = await api
+                .put(`/api/blogs/${updatedBlog.id}`)
+                .send(updatedBlog)
+                .expect(200) 
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.likes, blogToUpdate.likes + 1);
+
+        })
+
+        test('fails with status code 400 if likes is not provided', async () => {
+            const initialBlogs = await helper.blogsInDb()
+            const blogToUpdate = initialBlogs[0]
+            await api
+                .put(`/api/blogs/${blogToUpdate.id}`)
+                .send({})
+                .expect(400)
         })
 
     })
