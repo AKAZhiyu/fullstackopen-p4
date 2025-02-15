@@ -55,7 +55,7 @@ test('should default likes to 0 if missing in the request body', async () => {
     const newBlog = {
         title: 'create a new blog tittle with like missing',
         author: 'new blog with like missing creator',
-        url: 'http://www.newblog.creator.missing.like',
+        url: 'http://www.newblog.missing.like',
     }
 
     const response = await api
@@ -64,11 +64,39 @@ test('should default likes to 0 if missing in the request body', async () => {
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
-    const newAddedBlog = response.body 
+    const newAddedBlog = response.body
 
     assert.strictEqual(newAddedBlog.title, 'create a new blog tittle with like missing')
     assert.strictEqual(newAddedBlog.likes, 0)
 })
+
+test('should return 400 if title or url is missing', async () => {
+    const tittleMissingBlog = {
+        author: 'new blog with title missing creator',
+        url: 'http://www.newblog.missing.title',
+        likes: 10
+    }
+
+    const urlMissingBlog = {
+        title: 'create a new blog tittle m',
+        author: 'new blog with like missing title',
+        likes: 10
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(tittleMissingBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+    await api
+        .post('/api/blogs')
+        .send(urlMissingBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+})
+
 
 after(async () => {
     await mongoose.connection.close()
