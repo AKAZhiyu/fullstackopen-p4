@@ -8,7 +8,7 @@ usersRouter.post('/', async (request, response) => {
     if (!password) {
         return response.status(400).json({ error: 'Password is required' })
     }
-    
+
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
@@ -29,7 +29,12 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-    const users = await User.find({}).populate('blogs')
+    const users = await User.find({}).populate('blogs', {
+        url: 1,
+        title: 1,
+        author: 1,
+        id: 1
+    })
     response.json(users)
   })
   
