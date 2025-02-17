@@ -4,8 +4,9 @@ const mongoose = require('mongoose')
 const userSchema = mongoose.Schema({
   username: {
     type: String,
-    required: true,
-    unique: true // this ensures the uniqueness of username
+    required: [true, 'Username is required'],
+    unique: { values: true, message: 'Username must be unique' },
+    minlength: [3, 'Username must be at least 3 characters long']
   },
   name: String,
   passwordHash: String,
